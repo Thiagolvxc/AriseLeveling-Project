@@ -1,7 +1,11 @@
 import React from 'react'
+import {NavigationContainer} from '@react-navigation/native'
+import {createStackNavigator} from '@react-navigation/stack'
 
 import HomeScreen from '../screens/HomeScreen'
 import SplashScreen from '../screens/SplashScreen'
+
+const Stack = createStackNavigator();
 
 const AppNavigator = () => (
     <NavigationContainer>
