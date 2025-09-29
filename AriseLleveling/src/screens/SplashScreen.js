@@ -1,17 +1,21 @@
 import React, {useEffect} from 'react'
-import { StyleSheet, View, Text, Image} from 'react-native'
+import {StyleSheet, View, Text, Image} from 'react-native'
+import {useNavigation} from '@react-navigation/native'
 
 const SplashScreen = ({navigation}) =>{
+
+    const navogation = useNavigation();
+
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigation.replace('Home')
+            navigation.replace('MainTabs')
         }, 3000)
         return () => clearTimeout(timer)
     }, [navigation])
     return(
         <View style={styles.container}>
             <Text>Loading...</Text>
-            <Image souce={require ('../../assets/splash-icon.png')} style={styles.logo}></Image>
+            <Image source={require ('../../assets/splash-icon.png')} style={styles.logo}></Image>
         </View>
     )
 }
