@@ -5,7 +5,7 @@ import {LinearGradient} from 'expo-linear-gradient'
 
 const UserScreen = () => {
   return (
-    <LinearGradient colors={colors.gradienteTerciario} style={styles.container}>
+    <LinearGradient colors={colors.gradienteSecundario} style={styles.container}>
       <Text style={styles.text}>User</Text>
     </LinearGradient>
   )
