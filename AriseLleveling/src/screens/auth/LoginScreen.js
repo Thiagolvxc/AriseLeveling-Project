@@ -5,7 +5,6 @@ import {signInWithEmailAndPassword} from 'firebase/auth'
 import {auth} from '../../services/firebaseConfig'
 import colors from '../../constants/colors'
 import {useNavigation} from '@react-navigation/native'
-import {LinearGradient} from 'expo-linear-gradient'
 
 const LoginScreen = ({navigation}) => {
     const [email, setEmail] = useState('')
