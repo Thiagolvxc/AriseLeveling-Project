@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react'
 import {StyleSheet, Image, View} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
-import * as Progress from 'react-native-progress';
-import colors from '../constants/colors';
+import * as Progress from 'react-native-progress'
+import colors from '../constants/colors'
 
 const SplashScreen = ({navigation}) =>{
 
@@ -11,8 +11,8 @@ const SplashScreen = ({navigation}) =>{
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigation.replace('MainTabs')
-        }, 5000)
+            navigation.replace('Login');
+        }, 3500)
         
         let interval = setInterval(() => {
             setProgress(prev => {
@@ -33,8 +33,8 @@ const SplashScreen = ({navigation}) =>{
 
 
     return(
-        <View colors={colors.variante4} style={styles.container}>
-            <Image source={require ('../../assets/logo-SplashScreen.png')} style={styles.logo}></Image>
+        <View colors={colors.variante3} style={styles.container}>
+            <Image source={require ('../../assets/logo.png')} style={styles.logo}></Image>
             <Progress.Bar progress={progress} width={200} color="#3e00f8" style={styles.loader}/>
         </View>
     )

@@ -8,6 +8,8 @@ import colors from '../constants/colors'
 import HomeScreen from '../screens/HomeScreen'
 import SplashScreen from '../screens/SplashScreen'
 import UserScreen from '../screens/UserScreen'
+import LoginScreen from '../screens/auth/LoginScreen'
+import RegisterScreen from '../screens/auth/RegisterScreen'
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,7 +28,7 @@ const TabNavigator = () => {
             },
             tabBarActiveTintColor: colors.variante7,
             tabBarInactiveTintColor: colors.thin,
-            tabBarStyle: {background: colors.luminous}
+            tabBarStyle: {backgroundColor: colors.luminous}
         })}>
             <Tab.Screen name = 'Home' component={HomeScreen} options={{}}/>
             <Tab.Screen name = 'User' component={UserScreen} options={{}}/>
@@ -38,9 +40,9 @@ const AppNavigator = () => {
     return (
         <Stack.Navigator initialRouteName='Splash'>
             <Stack.Screen name="Splash" component={SplashScreen} options={{headerShown: false}}/>
-            <Stack.Screen name="Home" component={HomeScreen}/>
-            <Stack.Screen name="User" component={UserScreen}/>
-            <Stack.Screen name="MainTabs" component={TabNavigator} options={{headerShown: false}}/>
+            <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="Register" component={RegisterScreen} options={{headerShown: false}}/>
+            <Stack.Screen name="MainTabs" component={TabNavigator} options={{headerShown: false}}/>   
         </Stack.Navigator>
     )        
 }
