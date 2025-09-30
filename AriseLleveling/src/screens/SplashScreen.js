@@ -12,7 +12,7 @@ const SplashScreen = ({navigation}) =>{
     useEffect(() => {
         const timer = setTimeout(() => {
             navigation.replace('Login');
-        }, 3500)
+        }, 5000)
         
         let interval = setInterval(() => {
             setProgress(prev => {

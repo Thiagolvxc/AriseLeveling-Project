@@ -1,21 +1,68 @@
 import React, {useState} from 'react'
-import {View, Text, Image, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
+import {View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {signInWithEmailAndPassword} from 'firebase/auth'
 import {auth} from '../../services/firebaseConfig'
 import colors from '../../constants/colors'
 import {useNavigation} from '@react-navigation/native'
+import {LinearGradient} from 'expo-linear-gradient'
 
 const LoginScreen = ({navigation}) => {
-    const Navigation = useNavigation();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [errorMessages, setErrorMessages] = useState('')
+    const Navigation = useNavigation();
 
-    const handleLogin = () => {
-        navigation.replace('MainTabs')
+    const handleLogin = async () => {
+        if (!email || !password) {
+            setError('Por favor completa todos los campos');
+            return;
     }
+
+    setError('');
+        
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        Alert.alert('Éxito', 'Inicio de sesión exitoso', [
+            {text: 'OK', onPress: () => navigation.reset({
+                index: 0,
+                routes: [{ name: 'Main' }],
+            })}
+        ]);
+    }catch (error) {
+            console.error('Error al iniciar sesión:', error);
+            
+            let errorMessage = 'Error al iniciar sesión';
+            
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    errorMessage = 'No existe una cuenta con este correo electrónico';
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = 'Contraseña incorrecta';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = 'El formato del correo electrónico no es válido';
+                    break;
+                case 'auth/user-disabled':
+                    errorMessage = 'Esta cuenta ha sido deshabilitada';
+                    break;
+                case 'auth/too-many-requests':
+                    errorMessage = 'Demasiados intentos fallidos. Intenta más tarde';
+                    break;
+                case 'auth/network-request-failed':
+                    errorMessage = 'Error de conexión. Verifica tu internet';
+                    break;
+                default:
+                    errorMessage = error.message || 'Error desconocido';
+            }
+            
+            setError(errorMessage);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -99,7 +146,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     loginButton:{
-        backgroundColor: colors.principal,
+        backgroundColor: colors.variante6,
         paddingVertical: 15,
         paddingHorizontal: 50,
         borderRadius: 30,
@@ -114,10 +161,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     registerText:{
-        color: colors.subtle,
+        color: colors.default,
     },
     registerLink:{
-        color: colors.variante3,
+        color: colors.variante6,
         fontSize: 14,
         fontWeight: 'bold',
     },
