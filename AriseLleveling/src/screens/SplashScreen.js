@@ -1,21 +1,42 @@
 import React, {useEffect} from 'react'
 import {StyleSheet, View, Text, Image} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
+import CusthomTheme from '../constants/CusthomTheme'
+import * as Progress from 'react-native-progress';
 
 const SplashScreen = ({navigation}) =>{
 
-    const navogation = useNavigation();
+    const Navigation = useNavigation();
+    const [progress, setProgress] = React.useState(0);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             navigation.replace('MainTabs')
-        }, 3000)
-        return () => clearTimeout(timer)
-    }, [navigation])
+        }, 5000)
+        
+        let interval = setInterval(() => {
+            setProgress(prev => {
+                if (prev < 1) {
+                    return prev + 0.02;
+                } else {
+                    clearInterval(interval);
+                    return 1;
+                }
+            });
+        }, 100);
+
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+        };
+    }, [navigation]);
+
+
     return(
         <View style={styles.container}>
             <Text>Loading...</Text>
-            <Image source={require ('../../assets/splash-icon.png')} style={styles.logo}></Image>
+            <Image source={require ('../../assets/logo-SplashScreen.png')} style={styles.logo}></Image>
+            <Progress.Bar progress={progress} width={200} color="#3e00f8" style={styles.loader}/>
         </View>
     )
 }
@@ -24,7 +45,7 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#0000008b',
+        backgroundColor: CusthomTheme.colors.backgroundSplashScreen,
         justifyContent: 'center',
         alignItems: 'center',
     },

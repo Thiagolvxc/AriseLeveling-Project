@@ -11,7 +11,7 @@ export default {
     variante8: '#F4A261',
 
     // Colores para el texto y las sombras
-    default: '#333333', 
+    texto: '#333333', 
     subtle: '#555555', 
     thin: '#777777', 
     delicate: '#BBBBBB', 
