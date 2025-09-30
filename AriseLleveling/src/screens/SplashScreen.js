@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react'
-import {StyleSheet, View, Text, Image} from 'react-native'
+import {StyleSheet, Image, View} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
-import CusthomTheme from '../constants/CusthomTheme'
 import * as Progress from 'react-native-progress';
+import colors from '../constants/colors';
 
 const SplashScreen = ({navigation}) =>{
 
@@ -33,8 +33,7 @@ const SplashScreen = ({navigation}) =>{
 
 
     return(
-        <View style={styles.container}>
-            <Text>Loading...</Text>
+        <View colors={colors.variante4} style={styles.container}>
             <Image source={require ('../../assets/logo-SplashScreen.png')} style={styles.logo}></Image>
             <Progress.Bar progress={progress} width={200} color="#3e00f8" style={styles.loader}/>
         </View>
@@ -45,7 +44,6 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: CusthomTheme.colors.backgroundSplashScreen,
         justifyContent: 'center',
         alignItems: 'center',
     },

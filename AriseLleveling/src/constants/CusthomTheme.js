@@ -8,7 +8,7 @@ const CusthomTheme = {
         background: colors.variante6,
         backgroundSplashScreen: colors.variante4,
         card: colors.variante2,
-        text: colors.texto,
+        text: colors.default,
         
     }
 }

@@ -1,6 +1,6 @@
 export default {
     // Colores principales y variantes
-    principal :'#0077B6',
+    principal: '#0077B6',
     variante1: '#0096C7', 
     variante2: '#00B4D8', 
     variante3: '#48CAE4', 
@@ -11,7 +11,7 @@ export default {
     variante8: '#F4A261',
 
     // Colores para el texto y las sombras
-    texto: '#333333', 
+    default: '#333333', 
     subtle: '#555555', 
     thin: '#777777', 
     delicate: '#BBBBBB', 
@@ -29,5 +29,6 @@ export default {
     // Gradientes
     gradientePrimario: ['#0077B6', '#00B4D8'],
     gradienteSecundario: ['#023E8A', '#03045E'],
-    gradienteAccion: ['#F4A261', '#E63946']
+    gradienteTerciario: ['#8608a2', '#520578'],
+    gradienteAccion: ['#F4A261', '#E63946'],
 }
