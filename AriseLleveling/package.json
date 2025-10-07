@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package",
   "name": "ariselleveling",
   "version": "1.0.0",
   "main": "index.js",
@@ -19,6 +20,7 @@
     "@react-navigation/native-stack": "^7.3.26",
     "@react-navigation/stack": "^7.4.8",
     "expo": "^54.0.12",
+    "expo-image-picker": "^17.0.8",
     "expo-linear-gradient": "~15.0.7",
     "expo-status-bar": "~3.0.8",
     "firebase": "^12.3.0",
