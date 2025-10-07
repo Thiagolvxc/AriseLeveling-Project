@@ -1,8 +1,8 @@
 import React, {useState} from 'react'
 import {View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {signInWithEmailAndPassword} from 'firebase/auth'
-import {auth} from '../../services/firebaseConfig'
+import {signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential} from 'firebase/auth'
+import {auth, GoogleSignin} from '../../services/firebaseConfig'
 import colors from '../../constants/colors'
 import {useNavigation} from '@react-navigation/native'
 
@@ -12,6 +12,27 @@ const LoginScreen = ({navigation}) => {
     const [error, setError] = useState('')
     const [errorMessages, setErrorMessages] = useState('')
     const Navigation = useNavigation();
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await GoogleSignin.hasPlayServices();
+            const { idToken } = await GoogleSignin.signIn();
+            
+            const credential = GoogleAuthProvider.credential(idToken);
+            
+            const userCredential = await signInWithCredential(auth, credential);
+            
+            Alert.alert('Éxito', 'Inicio de sesión con Google exitoso', [
+                {text: 'OK', onPress: () => navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Main' }],
+                })}
+            ]);
+        } catch (error) {
+            console.error('Error al iniciar sesión con Google:', error);
+            setError('Error al iniciar sesión con Google');
+        }
+    };
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -89,6 +110,14 @@ const LoginScreen = ({navigation}) => {
                 <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity 
+                style={styles.googleButton}
+                onPress={handleGoogleSignIn}
+            >
+                <Icon name="google" size={24} color="#fff" style={styles.googleIcon} />
+                <Text style={styles.googleButtonText}>Continuar con Google</Text>
+            </TouchableOpacity>
+
             <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>¿No tienes una cuenta? </Text>
                 <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -100,7 +129,32 @@ const LoginScreen = ({navigation}) => {
     )
 }
 
+    // Botón de Google
+    const GoogleSignInButton = () => (
+        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
+            <Icon name="google" size={24} color="#fff" style={styles.googleIcon} />
+            <Text style={styles.googleButtonText}>Continuar con Google</Text>
+        </TouchableOpacity>
+    );
+
 const styles = StyleSheet.create({
+    googleButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#4285F4',
+        padding: 10,
+        borderRadius: 5,
+        marginVertical: 10,
+    },
+    googleIcon: {
+        marginRight: 10,
+    },
+    googleButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     container:{
         flex:   1,
         justifyContent: 'center',

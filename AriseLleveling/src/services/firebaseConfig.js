@@ -1,7 +1,8 @@
 import {initializeApp} from "firebase/app"
-import {initializeAuth, getReactNativePersistence} from "firebase/auth"
+import {initializeAuth, getReactNativePersistence, GoogleAuthProvider} from "firebase/auth"
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage"
 import {getStorage} from "firebase/storage"
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -9,7 +10,7 @@ const firebaseConfig = {
     projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
     storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
     messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.EXPO_PUBLICA_APP_ID
+    appId: process.env.EXPO_PUBLIC_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
@@ -19,4 +20,8 @@ const auth = initializeAuth(app, {
 
 const storage = getStorage(app);
 
-export {auth, storage};
+GoogleSignin.configure({
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+});
+
+export {auth, storage, GoogleSignin};
