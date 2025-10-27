@@ -11,6 +11,7 @@ export const requestImagePermission = async () => {
     }
     return true;
 }
+
 export const pickImage = async () => {
     const hasPermission = await requestImagePermission();
     if (!hasPermission) return null;
