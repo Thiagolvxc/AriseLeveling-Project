@@ -2,7 +2,8 @@ import {initializeApp} from "firebase/app"
 import {initializeAuth, getReactNativePersistence, GoogleAuthProvider} from "firebase/auth"
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage"
 import {getStorage} from "firebase/storage"
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import {getFirestore} from "firebase/firestore"
+import {GoogleSignin} from '@react-native-google-signin/google-signin'
 
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -14,7 +15,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = initializeAuth(app, {
+export const auth = initializeAuth(app, {
     persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
 
