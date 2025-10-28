@@ -6,6 +6,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicat
 import { pickImage, uploadImageToCloudinary } from '../services/cloudinaryService'
 import ImagePreviewModal from '../components/ImagePreviewModal'
 import { useFocusEffect } from '@react-navigation/native'
+import DatosForm from '../components/DatosForm'
+import { ScrollView } from 'react-native-gesture-handler'
 import { updateUserProfilePhoto, getUserData } from '../services/userService'
 
 const UserScreen = ({navigation }) => {
@@ -16,6 +18,7 @@ const UserScreen = ({navigation }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const defaultImage = 'https://via.placeholder.com/150';
+  const [showDatosForm,setShowDatosForm]= useState(false);
 
   const fetchUserProfile = useCallback(async () => {
     if (user) {
@@ -81,35 +84,44 @@ const UserScreen = ({navigation }) => {
 
   return (
 
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Perfil de Usuario</Text>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: imageUri }} style={styles.profileImage} resizeMode="cover"/>
 
-    <View style={styles.container}>
-      <Text style={styles.title}>Perfil de Usuario</Text>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUri }} style={styles.profileImage} resizeMode="cover"/>
+          <TouchableOpacity style={styles.changeImageButton} onPress={handleImageSelection} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.changeImageText}>Cambiar Foto</Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.changeImageButton} onPress={handleImageSelection} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <Text style={styles.changeImageText}>Cambiar Foto</Text>
-          )}
-        </TouchableOpacity>
+        </View>
 
+        <View style={styles.userInfo}>
+          <Text style={styles.userName}>{user?.displayName || 'Usuario'}</Text>
+          <Text style={styles.userEmail}>{user?.email}</Text>
+        </View>
+
+        <ImagePreviewModal
+          visible={showPreview}
+          imageUri={selectedImage?.uri}
+          loading={loading}
+          onConfirm={handleConfirmUpload}
+          onCancel={handleCancelSelection}
+        />
+
+        <TouchableOpacity style={styles.academicButton} onPress={toggleAcademicForm} disabled={loading}>
+            <Text style={styles.academicButtonText}>
+              {showAcademicForm ? 'Ocultar datos': 'Abrir datos'}
+            </Text>
+          </TouchableOpacity>
+
+          {showDatosForm && <DatosForm onClose={()=> setShowDatosForm(false)}/>}
       </View>
-
-      <View style={styles.userInfo}>
-        <Text style={styles.userName}>{user?.displayName || 'Usuario'}</Text>
-        <Text style={styles.userEmail}>{user?.email}</Text>
-      </View>
-
-      <ImagePreviewModal
-        visible={showPreview}
-        imageUri={selectedImage?.uri}
-        loading={loading}
-        onConfirm={handleConfirmUpload}
-        onCancel={handleCancelSelection}
-      />
-    </View>
+    </ScrollView>
   )
 }
 
