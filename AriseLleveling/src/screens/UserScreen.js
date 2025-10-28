@@ -1,7 +1,7 @@
 import React from 'react'
 import colors from '../constants/colors'
 import { useEffect, useState, useCallback } from 'react'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../navigation/AuthContext'
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native'
 import { pickImage, uploadImageToCloudinary } from '../services/cloudinaryService'
 import ImagePreviewModal from '../components/ImagePreviewModal'

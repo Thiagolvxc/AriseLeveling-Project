@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react'
 import {NavigationContainer} from '@react-navigation/native'
 import {createStackNavigator} from '@react-navigation/stack'
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import {Ionicons} from '@expo/vector-icons'
 import {auth} from '../services/firebaseConfig'
 import {onAuthStateChanged} from 'firebase/auth'
-import {useContext, createContext} from 'react'
+import { AuthContext, useAuth } from "./AuthContext";
 import colors from '../constants/colors'
 import HomeScreen from '../screens/HomeScreen'
 import SplashScreen from '../screens/SplashScreen'
@@ -15,15 +16,7 @@ import RegisterScreen from '../screens/auth/RegisterScreen'
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const AuthContext = createContext();
-
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};
+const ProfileStack = createNativeStackNavigator();
 
 const TabNavigator = () => {
     const {user} = useAuth();
