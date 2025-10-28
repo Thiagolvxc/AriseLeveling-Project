@@ -1,11 +1,15 @@
-import React from "react";
-import AppNavigator from "./src/navigation/AppNavigator";
-import {NavigationContainer} from "@react-navigation/native";
+import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
+import AppNavigator from './navigation/AppNavigator';
+import AppProvider from './navigation/AppProvider';
 
-export default function App () {
+export default function App() {
   return (
+    <AppProvider>
     <NavigationContainer>
-      <AppNavigator/>
+      <AppNavigator />
+      <StatusBar style="auto" />
     </NavigationContainer>
-  )
+    </AppProvider>
+  );
 }
