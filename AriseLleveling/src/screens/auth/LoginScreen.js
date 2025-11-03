@@ -94,7 +94,8 @@ const LoginScreen = ({navigation}) => {
                     style={styles.input}
                     placeholder="Correo Electrónico"
                     value={email}
-                    onChangeText={setEmail}/>
+                    onChangeText={setEmail}
+                    keyboardType='email'/>
             </View>
 
             <View style={styles.inputContainer}>

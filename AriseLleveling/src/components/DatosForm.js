@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { useAuth } from '../../navigation/AuthContext'
+import { useAuth } from '../context/AuthContext'
 import sqliteService from '../services/sqliteService';
 import { Alert } from 'react-native';
 import colors from '../constants/colors';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 
 const emptyForm = {
     nombre: '',
     edad: '',
-    anios: '',
 }
 
 const DatosForm =({onClose}) => {
     const {user} = useAuth();
     const [form, setForm]= useState(emptyForm);
     const [loading, setloading]=useState(false);
-    const [edad, setedad] = useState('');
-    const [anios, setanios] = useState('');
 
     useEffect(()=>{
         let mounted = true;
@@ -31,7 +28,6 @@ const DatosForm =({onClose}) => {
                         setForm({
                         nombre: data.nombre || '',
                         edad: data.edad || '',
-                        anios: data.anios || '',
                         });
                     }else{
                         setForm(emptyForm);
@@ -53,10 +49,6 @@ const DatosForm =({onClose}) => {
     },[user]);
 
     const handleChange = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
-    const handleNumericChange = (text, setter) => {
-        const numericText = text.replace(/[^0-9]/g, '');
-        setter(numericText);
-    };
 
     const handleSave = async () => {
         if (!user) return Alert.alert('Error', 'Usuario no autenticado');
@@ -122,10 +114,7 @@ const DatosForm =({onClose}) => {
             <TextInput style={styles.input} value={form.nombre} onChangeText={t => handleChange('nombre', t)} placeholder="Nombre Completo"/>
 
             <Text style={styles.label}>Edad</Text>
-            <TextInput style={styles.input} value={form.edad} onChangeText={(text) => handleNumericChange('text', 'setedad')} placeholder="Edad" keyboardType='numeric'/>
-
-            <Text style={styles.label}>Años</Text>
-            <TextInput style={styles.input} value={form.anios} onChangeText={(text) => handleNumericChange('text', 'setanios')} placeholder="Años" keyboardType='numeric'/>
+            <TextInput style={styles.input} value={form.edad} onChangeText={t => ('edad')} placeholder="Edad" keyboardType='numeric'/>
 
             <View style={styles.row}>
 
@@ -241,4 +230,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default DatosForm
+export default DatosForm;

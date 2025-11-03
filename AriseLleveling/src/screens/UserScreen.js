@@ -1,7 +1,7 @@
 import React from 'react'
 import colors from '../constants/colors'
 import { useEffect, useState, useCallback } from 'react'
-import { useAuth } from '../navigation/AuthContext'
+import { useAuth } from '../context/AuthContext'
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native'
 import { pickImage, uploadImageToCloudinary } from '../services/cloudinaryService'
 import ImagePreviewModal from '../components/ImagePreviewModal'
@@ -13,7 +13,7 @@ import { updateUserProfilePhoto, getUserData } from '../services/userService'
 const UserScreen = ({navigation }) => {
   const {user} = useAuth();
   const [imageUri, setImageUri] = useState(null);
-  const [userData, setUserData] = useState(null); 
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -40,6 +40,10 @@ const UserScreen = ({navigation }) => {
       fetchUserProfile();
     }, [fetchUserProfile])
   );
+
+  const toggleDatosForm = () => {
+    setShowDatosForm(!showDatosForm);
+  };
 
   const handleImageSelection = async () => {
     try {
@@ -113,9 +117,9 @@ const UserScreen = ({navigation }) => {
           onCancel={handleCancelSelection}
         />
 
-        <TouchableOpacity style={styles.academicButton} onPress={toggleAcademicForm} disabled={loading}>
+        <TouchableOpacity style={styles.academicButton} onPress={toggleDatosForm} disabled={loading}>
             <Text style={styles.academicButtonText}>
-              {showAcademicForm ? 'Ocultar datos': 'Abrir datos'}
+              {showDatosForm ? 'Ocultar datos': 'Abrir datos'}
             </Text>
           </TouchableOpacity>
 

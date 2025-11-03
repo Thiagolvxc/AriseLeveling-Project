@@ -2,27 +2,26 @@ import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabaseSync('AriseLleveling');
 
-const init = ()=>{
+export const init = () => {
     db.execSync(
         `CREATE TABLE IF NOT EXISTS user_Datos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT,
-            edad INTEGER,
-            anios INTEGER,
+            edad INTEGER
         );`
     )
 }
 
-const upsertDatos = (id, {nombre = null, edad = null, anios = null}={}) => {
+const upsertDatos = (id, {nombre = null, edad = null}={}) => {
     const result = db.runSync(
-        `INSERT OR REPLACE INTO user_academic (id, nombre, edad, anios) VALUES (?, ?, ?, ?);`, [id, nombre, edad, anios]
+        `INSERT OR REPLACE INTO user_Datos (id, nombre, edad) VALUES (?, ?, ?);`, [id, nombre, edad]
     )
     return result;
 }
 
 const getDatosById = (id) => {
     const row = db.getFirstSync(
-        `SELECT * FROM user_academic WHERE id = ?;`, [id]
+        `SELECT * FROM user_Datos WHERE id = ?;`, [id]
     )
     return row || null;
 }

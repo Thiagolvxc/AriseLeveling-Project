@@ -6,7 +6,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import {Ionicons} from '@expo/vector-icons'
 import {auth} from '../services/firebaseConfig'
 import {onAuthStateChanged} from 'firebase/auth'
-import { AuthContext, useAuth } from "./AuthContext";
+import { AuthContext, useAuth } from "../context/AuthContext";
 import {Image} from 'react-native';
 import colors from '../constants/colors'
 import HomeScreen from '../screens/HomeScreen'
@@ -24,7 +24,7 @@ const TabNavigator = () => {
 
     return(
         <Tab.Navigator initialRouteName='Home' screenOptions={({route}) => ({
-            tabBarIcon: ({color, size}) =>{
+            tabBarIcon: ({color, size, focused}) =>{
                 let iconName;
                 if(route.name === 'Home'){
                     iconName = 'home-outline'
@@ -40,7 +40,6 @@ const TabNavigator = () => {
                             }}/>
                         );
                     }
-                        // Si no tiene foto, mostrar el icono por defecto
                     return <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />;
                 }
                 return <Ionicons name={iconName} size={size} color={color}/>

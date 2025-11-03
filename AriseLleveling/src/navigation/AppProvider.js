@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import sqliteService from '../src/services/sqliteService';
+import sqliteService from '../services/sqliteService';
 
 const AppProvider = ({ children }) => {
     const [ready, setReady] = useState(false);
