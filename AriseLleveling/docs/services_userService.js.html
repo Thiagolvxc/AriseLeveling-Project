@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/userService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/userService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file firestoreService.js
+ * @description Servicio de interacción con Firestore y Firebase Authentication.
+ * Permite actualizar la foto de perfil del usuario y obtener sus datos desde la colección `users`.
+ */
+
+import {getFirestore, doc, setDoc, getDoc} from "firebase/firestore";
+import { getAuth, updateProfile } from 'firebase/auth';
+import app from './firebaseConfig';
+
+/**
+ * @constant {Firestore} db
+ * @description Instancia de la base de datos Firestore inicializada con la app de Firebase.
+ */
+const db = getFirestore(app);
+
+/**
+ * @constant {Auth} auth
+ * @description Instancia del servicio de autenticación de Firebase.
+ */
+const auth = getAuth(app);
+
+/**
+ * @async
+ * @function updateUserProfilePhoto
+ * @description Actualiza la foto de perfil del usuario tanto en Firebase Authentication
+ * como en su documento correspondiente dentro de Firestore.
+ *
+ * @param {string} userId - ID único del usuario en Firebase Authentication.
+ * @param {string} photoURL - URL pública de la nueva foto de perfil.
+ * 
+ * @throws {Error} Si `userId` no está definido o si ocurre un error durante la actualización.
+ * @returns {Promise&lt;boolean>} Retorna `true` si la actualización se completó correctamente.
+ *
+ * @example
+ * await updateUserProfilePhoto('user123', 'https://miapp.com/fotos/usuario123.jpg');
+ */
+export const updateUserProfilePhoto = async (userId, photoURL) => {
+    if (!userId) {
+        throw new Error("Se requiere un ID de usuario para actualizar el perfil.");
+    }
+
+    try {
+        if (auth.currentUser) {
+        await updateProfile(auth.currentUser, { photoURL: photoURL });
+        }
+
+        const userRef = doc(db, 'users', userId);
+        await setDoc(userRef, {
+            photoURL: photoURL,
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+    
+        console.log('Foto de perfil actualizada exitosamente en Auth y Firestore.');
+        return true;
+
+    } catch (error) {
+    console.error('Error updating user profile photo:', error);
+    throw error;
+    }
+};
+
+/**
+ * @async
+ * @function getUserData
+ * @description Obtiene los datos de un usuario desde la colección `users` en Firestore.
+ *
+ * @param {string} userId - ID único del usuario.
+ * @returns {Promise&lt;Object|null>} Objeto con los datos del usuario si el documento existe, o `null` si no.
+ *
+ * @throws {Error} Si ocurre un error durante la lectura de Firestore.
+ *
+ * @example
+ * const userData = await getUserData('user123');
+ * console.log(userData?.photoURL);
+ */
+export const getUserData = async (userId) => {
+    if (!userId) return null;
+
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userSnap = await getDoc(userRef);
+    
+        if (userSnap.exists()) {
+        return userSnap.data();
+        } else {
+            console.warn(`No se encontró un documento para el usuario con ID: ${userId}`);
+        return null;
+        }
+    } catch (error) {
+    console.error('Error getting user data:', error);
+    throw error;
+    }
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-storage.html">storage</a></li><li><a href="module-undefined.html">undefined</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AppNavigator">AppNavigator</a></li><li><a href="global.html#AppProvider">AppProvider</a></li><li><a href="global.html#CLOUDINARY_CLOUD_NAME">CLOUDINARY_CLOUD_NAME</a></li><li><a href="global.html#CLOUDINARY_UPLOAD_PRESET">CLOUDINARY_UPLOAD_PRESET</a></li><li><a href="global.html#DatosForm">DatosForm</a></li><li><a href="global.html#HomeScreen">HomeScreen</a></li><li><a href="global.html#LoginScreen">LoginScreen</a></li><li><a href="global.html#ProfileStack">ProfileStack</a></li><li><a href="global.html#RegisterScreen">RegisterScreen</a></li><li><a href="global.html#SplashScreen">SplashScreen</a></li><li><a href="global.html#Stack">Stack</a></li><li><a href="global.html#Tab">Tab</a></li><li><a href="global.html#UserScreen">UserScreen</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#deleteDatosById">deleteDatosById</a></li><li><a href="global.html#emptyForm">emptyForm</a></li><li><a href="global.html#fetchUserProfile">fetchUserProfile</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#getDatosById">getDatosById</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#handleCancelSelection">handleCancelSelection</a></li><li><a href="global.html#handleChange">handleChange</a></li><li><a href="global.html#handleConfirmUpload">handleConfirmUpload</a></li><li><a href="global.html#handleDelete">handleDelete</a></li><li><a href="global.html#handleImageSelection">handleImageSelection</a></li><li><a href="global.html#handleLogin">handleLogin</a></li><li><a href="global.html#handleRegister">handleRegister</a></li><li><a href="global.html#handleSave">handleSave</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#pickImage">pickImage</a></li><li><a href="global.html#requestImagePermission">requestImagePermission</a></li><li><a href="global.html#selectAndUploadImage">selectAndUploadImage</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#tabBarIcon">tabBarIcon</a></li><li><a href="global.html#toggleDatosForm">toggleDatosForm</a></li><li><a href="global.html#updateUserProfilePhoto">updateUserProfilePhoto</a></li><li><a href="global.html#uploadImageToCloudinary">uploadImageToCloudinary</a></li><li><a href="global.html#upsertDatos">upsertDatos</a></li><li><a href="global.html#user">user</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 03 2025 21:40:40 GMT-0500 (hora estándar de Colombia)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

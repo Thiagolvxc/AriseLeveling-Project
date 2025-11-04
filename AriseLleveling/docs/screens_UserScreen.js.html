@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: screens/UserScreen.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: screens/UserScreen.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file UserScreen.jsx
+ * @description Pantalla de perfil de usuario. Permite ver, actualizar y administrar la información del usuario,
+ * incluyendo la foto de perfil y los datos almacenados localmente.
+ */
+
+import React from 'react'
+import colors from '../constants/colors'
+import { useEffect, useState, useCallback } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native'
+import { pickImage, uploadImageToCloudinary } from '../services/cloudinaryService'
+import ImagePreviewModal from '../components/ImagePreviewModal'
+import { useFocusEffect } from '@react-navigation/native'
+import DatosForm from '../components/DatosForm'
+import { ScrollView } from 'react-native-gesture-handler'
+import { updateUserProfilePhoto, getUserData } from '../services/userService'
+
+/**
+ * @component UserScreen
+ * @description Pantalla de perfil del usuario autenticado.
+ * Permite visualizar los datos del usuario, modificar su foto de perfil
+ * y acceder a un formulario local para editar información adicional almacenada en SQLite.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {import('@react-navigation/native').NavigationProp} props.navigation - Objeto de navegación de React Navigation.
+ *
+ * @returns {JSX.Element} Pantalla de usuario con opciones de edición y carga de datos.
+ */
+const UserScreen = ({navigation }) => {
+
+  /**
+   * @constant {Object} user - Usuario actual obtenido desde el contexto de autenticación.
+   */
+  const {user} = useAuth();
+
+  /**
+   * @state imageUri
+   * @type {string|null}
+   * @description URI de la imagen actual del usuario (local o remota).
+   */
+  const [imageUri, setImageUri] = useState(null);
+
+  /**
+   * @state userData
+   * @type {Object|null}
+   * @description Datos adicionales del usuario obtenidos desde Firestore.
+   */
+  const [userData, setUserData] = useState(null);
+
+  /**
+   * @state loading
+   * @type {boolean}
+   * @description Indica si hay una operación de carga o actualización en progreso.
+   */
+  const [loading, setLoading] = useState(false);
+
+  /**
+   * @state selectedImage
+   * @type {Object|null}
+   * @description Imagen seleccionada por el usuario antes de subirla.
+   */
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  /**
+   * @state showPreview
+   * @type {boolean}
+   * @description Controla la visualización previa de la imagen antes de confirmarla.
+   */
+  const [showPreview, setShowPreview] = useState(false);
+
+  /**
+   * @constant {string}
+   * @description URL de la imagen por defecto cuando el usuario no tiene foto asignada.
+   */
+  const defaultImage = 'https://via.placeholder.com/150';
+
+  /**
+   * @state showDatosForm
+   * @type {boolean}
+   * @description Controla la visualización del formulario local (DatosForm) para editar datos almacenados en SQLite.
+   */
+  const [showDatosForm,setShowDatosForm]= useState(false);
+
+  /**
+   * @function fetchUserProfile
+   * @async
+   * @description Obtiene los datos del perfil del usuario desde Firestore.
+   * Si existe una foto de perfil, la muestra; de lo contrario, usa la imagen por defecto.
+   */
+  const fetchUserProfile = useCallback(async () => {
+    if (user) {
+      setLoading(true);
+      try {
+        const firestoreUserData = await getUserData(user.uid);
+        setUserData(firestoreUserData);
+        setImageUri(firestoreUserData?.photoURL || user.photoURL || defaultImage);
+      } catch (error) {
+        console.error("Error al obtener datos del perfil:", error);
+        setImageUri(user.photoURL || defaultImage); 
+      } finally {
+        setLoading(false);
+      }
+    }
+  }, [user]);
+
+  /**
+   * @hook useFocusEffect
+   * @description Ejecuta `fetchUserProfile` cada vez que la pantalla obtiene foco,
+   * asegurando que los datos se mantengan actualizados.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserProfile();
+    }, [fetchUserProfile])
+  );
+
+  /**
+   * @function toggleDatosForm
+   * @description Alterna la visualización del formulario local de datos (DatosForm).
+   */
+  const toggleDatosForm = () => {
+    setShowDatosForm(!showDatosForm);
+  };
+
+  /**
+   * @function handleImageSelection
+   * @async
+   * @description Abre el selector de imágenes del dispositivo para elegir una nueva foto de perfil.
+   */
+  const handleImageSelection = async () => {
+    try {
+      const imageAsset = await pickImage();
+      if (imageAsset) {
+        setSelectedImage(imageAsset);
+        setShowPreview(true);
+      }
+    } catch (error) {
+      console.error('Error selecting image:', error);
+      Alert.alert('Error', 'No se pudo seleccionar la imagen');
+    }
+  };
+
+  /**
+   * @function handleConfirmUpload
+   * @async
+   * @description Confirma y sube la imagen seleccionada a Cloudinary.
+   * Actualiza la foto de perfil del usuario en Firestore y en el contexto local.
+   */
+  const handleConfirmUpload = async () => {
+    if (!selectedImage) return;
+
+    try {
+      setLoading(true);
+      setShowPreview(false);
+
+      const imageUrl = await uploadImageToCloudinary(selectedImage.uri);
+
+      await updateUserProfilePhoto(user.uid, imageUrl);
+
+      setImageUri(imageUrl); 
+      setSelectedImage(null);
+      Alert.alert('Éxito', 'Imagen de perfil actualizada correctamente');
+
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      Alert.alert('Error', 'No se pudo actualizar la imagen de perfil');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * @function handleCancelSelection
+   * @description Cancela la selección de imagen y oculta la vista previa.
+   */
+  const handleCancelSelection = () => {
+    setSelectedImage(null);
+    setShowPreview(false);
+  };
+
+  return (
+
+    &lt;ScrollView>
+      &lt;View style={styles.container}>
+        &lt;Text style={styles.title}>Perfil de Usuario&lt;/Text>
+        &lt;View style={styles.imageContainer}>
+          &lt;Image source={{ uri: imageUri }} style={styles.profileImage} resizeMode="cover"/>
+
+          &lt;TouchableOpacity style={styles.changeImageButton} onPress={handleImageSelection} disabled={loading}>
+            {loading ? (
+              &lt;ActivityIndicator color="#fff" size="small" />
+            ) : (
+              &lt;Text style={styles.changeImageText}>Cambiar Foto&lt;/Text>
+            )}
+          &lt;/TouchableOpacity>
+
+        &lt;/View>
+
+        &lt;View style={styles.userInfo}>
+          &lt;Text style={styles.userName}>{user?.displayName || 'Usuario'}&lt;/Text>
+          &lt;Text style={styles.userEmail}>{user?.email}&lt;/Text>
+        &lt;/View>
+
+        &lt;ImagePreviewModal
+          visible={showPreview}
+          imageUri={selectedImage?.uri}
+          loading={loading}
+          onConfirm={handleConfirmUpload}
+          onCancel={handleCancelSelection}
+        />
+
+        &lt;TouchableOpacity style={styles.academicButton} onPress={toggleDatosForm} disabled={loading}>
+            &lt;Text style={styles.academicButtonText}>
+              {showDatosForm ? 'Ocultar datos': 'Abrir datos'}
+            &lt;/Text>
+          &lt;/TouchableOpacity>
+
+          {showDatosForm &amp;&amp; &lt;DatosForm onClose={()=> setShowDatosForm(false)}/>}
+      &lt;/View>
+    &lt;/ScrollView>
+  )
+}
+
+const styles = StyleSheet.create({
+  container:{
+    flex:1,
+    padding: 20,
+    backgroundColor: colors.fondoClaro,
+  },
+
+  title:{
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: colors.principal,
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+
+  imageContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 15,
+    borderWidth: 3,
+    borderColor: colors.principal,
+  },
+
+  changeImageButton: {
+    backgroundColor: colors.principal,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+
+  changeImageText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  userInfo: {
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+
+  userName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: colors.principal,
+    marginBottom: 5,
+  },
+
+  userEmail: {
+    fontSize: 16,
+    color: colors.subtle,
+  },
+})
+
+export default UserScreen;  </code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-storage.html">storage</a></li><li><a href="module-undefined.html">undefined</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AppNavigator">AppNavigator</a></li><li><a href="global.html#AppProvider">AppProvider</a></li><li><a href="global.html#CLOUDINARY_CLOUD_NAME">CLOUDINARY_CLOUD_NAME</a></li><li><a href="global.html#CLOUDINARY_UPLOAD_PRESET">CLOUDINARY_UPLOAD_PRESET</a></li><li><a href="global.html#DatosForm">DatosForm</a></li><li><a href="global.html#HomeScreen">HomeScreen</a></li><li><a href="global.html#LoginScreen">LoginScreen</a></li><li><a href="global.html#ProfileStack">ProfileStack</a></li><li><a href="global.html#RegisterScreen">RegisterScreen</a></li><li><a href="global.html#SplashScreen">SplashScreen</a></li><li><a href="global.html#Stack">Stack</a></li><li><a href="global.html#Tab">Tab</a></li><li><a href="global.html#UserScreen">UserScreen</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#deleteDatosById">deleteDatosById</a></li><li><a href="global.html#emptyForm">emptyForm</a></li><li><a href="global.html#fetchUserProfile">fetchUserProfile</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#getDatosById">getDatosById</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#handleCancelSelection">handleCancelSelection</a></li><li><a href="global.html#handleChange">handleChange</a></li><li><a href="global.html#handleConfirmUpload">handleConfirmUpload</a></li><li><a href="global.html#handleDelete">handleDelete</a></li><li><a href="global.html#handleImageSelection">handleImageSelection</a></li><li><a href="global.html#handleLogin">handleLogin</a></li><li><a href="global.html#handleRegister">handleRegister</a></li><li><a href="global.html#handleSave">handleSave</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#pickImage">pickImage</a></li><li><a href="global.html#requestImagePermission">requestImagePermission</a></li><li><a href="global.html#selectAndUploadImage">selectAndUploadImage</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#tabBarIcon">tabBarIcon</a></li><li><a href="global.html#toggleDatosForm">toggleDatosForm</a></li><li><a href="global.html#updateUserProfilePhoto">updateUserProfilePhoto</a></li><li><a href="global.html#uploadImageToCloudinary">uploadImageToCloudinary</a></li><li><a href="global.html#upsertDatos">upsertDatos</a></li><li><a href="global.html#user">user</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 03 2025 21:40:40 GMT-0500 (hora estándar de Colombia)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

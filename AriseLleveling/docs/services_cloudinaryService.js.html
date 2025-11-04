@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/cloudinaryService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/cloudinaryService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file imageService.js
+ * @description Servicio para manejar selección, permisos y carga de imágenes
+ * utilizando Expo Image Picker y Cloudinary.
+ */
+
+import * as ImagePicker from 'expo-image-picker';
+
+/**
+ * @constant {string}
+ * @description Nombre del cloud configurado en Cloudinary.
+ * Se obtiene de las variables de entorno públicas de Expo.
+ */
+const CLOUDINARY_CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your_cloud_name';
+
+/**
+ * @constant {string}
+ * @description Nombre del preset de carga configurado en Cloudinary.
+ * Se obtiene de las variables de entorno públicas de Expo.
+ */
+const CLOUDINARY_UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'your_upload_preset';
+
+/**
+ * @function requestImagePermission
+ * @async
+ * @description Solicita permisos para acceder a la galería de imágenes del dispositivo.
+ *
+ * @returns {Promise&lt;boolean>} `true` si el permiso fue concedido, `false` en caso contrario.
+ */
+export const requestImagePermission = async () => {
+    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+        alert('lo siento, necesitamos permisos para acceder a tus fotos.');
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @function pickImage
+ * @async
+ * @description Abre la galería del dispositivo para seleccionar una imagen.
+ * Requiere permisos previos del usuario. Si el usuario cancela, retorna `null`.
+ *
+ * @returns {Promise&lt;Object|null>} Objeto con los datos de la imagen seleccionada o `null` si se cancela.
+ * @example
+ * const image = await pickImage();
+ * if (image) console.log(image.uri);
+ */
+export const pickImage = async () => {
+    const hasPermission = await requestImagePermission();
+    if (!hasPermission) return null;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+        mediatypes: 'images',
+        allowsEditing: false,
+        quality: 0.8,
+    });
+
+    if (!result.canceled) {
+        return result.assets[0];
+    }
+    return null;
+};
+
+/**
+ * @function uploadImageToCloudinary
+ * @async
+ * @description Carga una imagen a Cloudinary utilizando su API.
+ *
+ * @param {string} imageUri - URI local de la imagen seleccionada.
+ * @returns {Promise&lt;string>} URL pública (`secure_url`) de la imagen subida a Cloudinary.
+ *
+ * @throws {Error} Si ocurre un error durante la carga.
+ *
+ * @example
+ * const imageUrl = await uploadImageToCloudinary('file:///path/to/image.jpg');
+ * console.log('URL de Cloudinary:', imageUrl);
+ */
+export const uploadImageToCloudinary = async (imageUri) => {
+    try {
+        const formData = new FormData();
+        formData.append('file', {
+            uri: imageUri,
+            type: 'image/jpeg',
+            name: 'profile_image.jpg',
+        });
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        formData.append('cloud_name', CLOUDINARY_CLOUD_NAME);
+
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+            {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Error al subir la imagen');
+        }
+
+        const data = await response.json();
+        return data.secure_url;
+    } catch (error) {
+    console.error('Error uploading image to Cloudinary:', error);
+    throw error;
+    }
+};
+
+/**
+ * @function selectAndUploadImage
+ * @async
+ * @description Combina la selección y carga de imagen en una sola función.
+ * Permite al usuario elegir una imagen y la sube directamente a Cloudinary.
+ *
+ * @returns {Promise&lt;string|null>} URL de la imagen subida o `null` si el proceso falla o se cancela.
+ *
+ * @example
+ * const imageUrl = await selectAndUploadImage();
+ * if (imageUrl) console.log('Imagen subida a:', imageUrl);
+ */
+export const selectAndUploadImage = async () => {
+    try {
+        const imageAsset = await pickImage();
+        if (!imageAsset) return null;
+
+        const imageUrl = await uploadImageToCloudinary(imageAsset.uri);
+        return imageUrl;
+    } catch (error) {
+        console.error('Error in selectAndUploadImage:', error);
+        alert('Error al subir la imagen. Por favor, inténtalo de nuevo.');
+    return null;
+    }
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-storage.html">storage</a></li><li><a href="module-undefined.html">undefined</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AppNavigator">AppNavigator</a></li><li><a href="global.html#AppProvider">AppProvider</a></li><li><a href="global.html#CLOUDINARY_CLOUD_NAME">CLOUDINARY_CLOUD_NAME</a></li><li><a href="global.html#CLOUDINARY_UPLOAD_PRESET">CLOUDINARY_UPLOAD_PRESET</a></li><li><a href="global.html#DatosForm">DatosForm</a></li><li><a href="global.html#HomeScreen">HomeScreen</a></li><li><a href="global.html#LoginScreen">LoginScreen</a></li><li><a href="global.html#ProfileStack">ProfileStack</a></li><li><a href="global.html#RegisterScreen">RegisterScreen</a></li><li><a href="global.html#SplashScreen">SplashScreen</a></li><li><a href="global.html#Stack">Stack</a></li><li><a href="global.html#Tab">Tab</a></li><li><a href="global.html#UserScreen">UserScreen</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#deleteDatosById">deleteDatosById</a></li><li><a href="global.html#emptyForm">emptyForm</a></li><li><a href="global.html#fetchUserProfile">fetchUserProfile</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#getDatosById">getDatosById</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#handleCancelSelection">handleCancelSelection</a></li><li><a href="global.html#handleChange">handleChange</a></li><li><a href="global.html#handleConfirmUpload">handleConfirmUpload</a></li><li><a href="global.html#handleDelete">handleDelete</a></li><li><a href="global.html#handleImageSelection">handleImageSelection</a></li><li><a href="global.html#handleLogin">handleLogin</a></li><li><a href="global.html#handleRegister">handleRegister</a></li><li><a href="global.html#handleSave">handleSave</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#pickImage">pickImage</a></li><li><a href="global.html#requestImagePermission">requestImagePermission</a></li><li><a href="global.html#selectAndUploadImage">selectAndUploadImage</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#tabBarIcon">tabBarIcon</a></li><li><a href="global.html#toggleDatosForm">toggleDatosForm</a></li><li><a href="global.html#updateUserProfilePhoto">updateUserProfilePhoto</a></li><li><a href="global.html#uploadImageToCloudinary">uploadImageToCloudinary</a></li><li><a href="global.html#upsertDatos">upsertDatos</a></li><li><a href="global.html#user">user</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 03 2025 21:40:40 GMT-0500 (hora estándar de Colombia)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

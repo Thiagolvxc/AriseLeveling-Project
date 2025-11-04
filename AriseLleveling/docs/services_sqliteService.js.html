@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/sqliteService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/sqliteService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file sqliteService.js
+ * @description Servicio de base de datos local utilizando `expo-sqlite`.
+ * Permite crear, insertar, consultar y eliminar registros de la tabla `user_Datos`.
+ */
+
+import * as SQLite from 'expo-sqlite';
+
+/**
+ * @constant {Database}
+ * @description Instancia de la base de datos SQLite.
+ * Se abre (o crea si no existe) una base de datos llamada `AriseLleveling`.
+ */
+const db = SQLite.openDatabaseSync('AriseLleveling');
+
+/**
+ * @function init
+ * @description Inicializa la base de datos local y crea la tabla `user_Datos` si no existe.
+ * 
+ * La tabla contiene los siguientes campos:
+ * - `id`: Identificador único (autoincremental).
+ * - `nombre`: Nombre del usuario.
+ * - `edad`: Edad del usuario.
+ * 
+ * @returns {void}
+ */
+export const init = () => {
+    db.execSync(
+        `CREATE TABLE IF NOT EXISTS user_Datos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT,
+            edad INTEGER
+        );`
+    )
+}
+
+/**
+ * @function upsertDatos
+ * @description Inserta o actualiza un registro en la tabla `user_Datos`.
+ * Si el `id` ya existe, reemplaza el registro existente (comportamiento "upsert").
+ * 
+ * @param {number} id - Identificador del usuario.
+ * @param {Object} [datos={}] - Objeto con los datos del usuario.
+ * @param {string|null} [datos.nombre=null] - Nombre del usuario.
+ * @param {number|null} [datos.edad=null] - Edad del usuario.
+ * 
+ * @returns {SQLite.RunResult} Resultado de la operación SQLite.
+ * 
+ * @example
+ * upsertDatos(1, { nombre: 'Juan', edad: 25 });
+ */
+const upsertDatos = (id, {nombre = null, edad = null}={}) => {
+    const edadInt = edad === null ? null : parseInt(edad, 10);
+    const result = db.runSync(
+        `INSERT OR REPLACE INTO user_Datos (id, nombre, edad) VALUES (?, ?, ?);`, [id, nombre, edad]
+    )
+    return result;
+}
+
+/**
+ * @function getDatosById
+ * @description Obtiene un registro de la tabla `user_Datos` a partir de su `id`.
+ * 
+ * @param {number} id - Identificador del usuario a consultar.
+ * @returns {Object|null} Objeto con los datos del usuario o `null` si no existe.
+ * 
+ * @example
+ * const usuario = getDatosById(1);
+ * console.log(usuario?.nombre);
+ */ 
+const getDatosById = (id) => {
+    const row = db.getFirstSync(
+        `SELECT * FROM user_Datos WHERE id = ?;`, [id]
+    )
+    return row || null;
+}
+
+
+/**
+ * @function deleteDatosById
+ * @description Elimina un registro de la tabla `user_Datos` por su identificador.
+ * 
+ * @param {number} id - Identificador del registro a eliminar.
+ * @returns {SQLite.RunResult} Resultado de la operación de eliminación.
+ * 
+ * @example
+ * deleteDatosById(1);
+ */
+const deleteDatosById = (id) => {
+    const result = db.runSync(
+        `DELETE FROM user_Datos WHERE id = ?;`, [id]
+    )
+    return result;
+}
+
+/**
+ * @exports
+ * @description Exporta las funciones principales del servicio SQLite.
+ */
+export default {init, upsertDatos, getDatosById, deleteDatosById}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-storage.html">storage</a></li><li><a href="module-undefined.html">undefined</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AppNavigator">AppNavigator</a></li><li><a href="global.html#AppProvider">AppProvider</a></li><li><a href="global.html#CLOUDINARY_CLOUD_NAME">CLOUDINARY_CLOUD_NAME</a></li><li><a href="global.html#CLOUDINARY_UPLOAD_PRESET">CLOUDINARY_UPLOAD_PRESET</a></li><li><a href="global.html#DatosForm">DatosForm</a></li><li><a href="global.html#HomeScreen">HomeScreen</a></li><li><a href="global.html#LoginScreen">LoginScreen</a></li><li><a href="global.html#ProfileStack">ProfileStack</a></li><li><a href="global.html#RegisterScreen">RegisterScreen</a></li><li><a href="global.html#SplashScreen">SplashScreen</a></li><li><a href="global.html#Stack">Stack</a></li><li><a href="global.html#Tab">Tab</a></li><li><a href="global.html#UserScreen">UserScreen</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#deleteDatosById">deleteDatosById</a></li><li><a href="global.html#emptyForm">emptyForm</a></li><li><a href="global.html#fetchUserProfile">fetchUserProfile</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#getDatosById">getDatosById</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#handleCancelSelection">handleCancelSelection</a></li><li><a href="global.html#handleChange">handleChange</a></li><li><a href="global.html#handleConfirmUpload">handleConfirmUpload</a></li><li><a href="global.html#handleDelete">handleDelete</a></li><li><a href="global.html#handleImageSelection">handleImageSelection</a></li><li><a href="global.html#handleLogin">handleLogin</a></li><li><a href="global.html#handleRegister">handleRegister</a></li><li><a href="global.html#handleSave">handleSave</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#pickImage">pickImage</a></li><li><a href="global.html#requestImagePermission">requestImagePermission</a></li><li><a href="global.html#selectAndUploadImage">selectAndUploadImage</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#tabBarIcon">tabBarIcon</a></li><li><a href="global.html#toggleDatosForm">toggleDatosForm</a></li><li><a href="global.html#updateUserProfilePhoto">updateUserProfilePhoto</a></li><li><a href="global.html#uploadImageToCloudinary">uploadImageToCloudinary</a></li><li><a href="global.html#upsertDatos">upsertDatos</a></li><li><a href="global.html#user">user</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 03 2025 21:40:40 GMT-0500 (hora estándar de Colombia)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

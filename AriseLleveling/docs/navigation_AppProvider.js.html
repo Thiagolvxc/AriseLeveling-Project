@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: navigation/AppProvider.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: navigation/AppProvider.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file AppProvider.jsx
+ * @description Proveedor principal de la aplicación. 
+ * Se encarga de inicializar la base de datos local SQLite antes de renderizar el resto de la aplicación.
+ * Muestra un indicador de carga mientras se completa la inicialización.
+ */
+
+import { useState, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import sqliteService from '../services/sqliteService';
+
+/**
+ * @component AppProvider
+ * @description Componente de alto nivel que inicializa recursos críticos de la aplicación (como SQLite) antes de renderizar los hijos.
+ * @param {Object} props - Propiedades del componente.
+ * @param {React.ReactNode} props.children - Componentes hijos que se renderizan una vez completada la inicialización.
+ * @returns {JSX.Element} Vista de carga mientras se inicializa, o los hijos una vez lista la app.
+ */
+const AppProvider = ({ children }) => {
+    /**
+     * @state
+     * @type {[boolean, Function]}
+     * @description Indica si la aplicación ya completó la inicialización de recursos (por ejemplo, la base de datos SQLite).
+     */
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+        let mounted = true;
+
+        /**
+         * @async
+         * @function init
+         * @description Inicializa el servicio de SQLite y marca el estado como listo una vez completado.
+         */
+        const init = async () => {
+            try {
+                await sqliteService.init();
+            } catch (e) {
+                console.warn('SQLite init error', e);
+            } finally {
+                if (mounted) setReady(true);
+            }
+        };
+        init();
+        return () => { mounted = false; };
+    }, []);
+
+    /**
+     * @returns {JSX.Element} Muestra un indicador de carga mientras la aplicación se prepara.
+     */
+    if (!ready) {
+        return (
+            &lt;View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                &lt;ActivityIndicator size="large" />
+            &lt;/View>
+        );
+    }
+    /**
+     * @returns {JSX.Element} Los componentes hijos de la aplicación una vez la inicialización ha terminado.
+     */
+    return children;
+};
+
+
+export default AppProvider;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-storage.html">storage</a></li><li><a href="module-undefined.html">undefined</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AppNavigator">AppNavigator</a></li><li><a href="global.html#AppProvider">AppProvider</a></li><li><a href="global.html#CLOUDINARY_CLOUD_NAME">CLOUDINARY_CLOUD_NAME</a></li><li><a href="global.html#CLOUDINARY_UPLOAD_PRESET">CLOUDINARY_UPLOAD_PRESET</a></li><li><a href="global.html#DatosForm">DatosForm</a></li><li><a href="global.html#HomeScreen">HomeScreen</a></li><li><a href="global.html#LoginScreen">LoginScreen</a></li><li><a href="global.html#ProfileStack">ProfileStack</a></li><li><a href="global.html#RegisterScreen">RegisterScreen</a></li><li><a href="global.html#SplashScreen">SplashScreen</a></li><li><a href="global.html#Stack">Stack</a></li><li><a href="global.html#Tab">Tab</a></li><li><a href="global.html#UserScreen">UserScreen</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#auth">auth</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#deleteDatosById">deleteDatosById</a></li><li><a href="global.html#emptyForm">emptyForm</a></li><li><a href="global.html#fetchUserProfile">fetchUserProfile</a></li><li><a href="global.html#firebaseConfig">firebaseConfig</a></li><li><a href="global.html#getDatosById">getDatosById</a></li><li><a href="global.html#getUserData">getUserData</a></li><li><a href="global.html#handleCancelSelection">handleCancelSelection</a></li><li><a href="global.html#handleChange">handleChange</a></li><li><a href="global.html#handleConfirmUpload">handleConfirmUpload</a></li><li><a href="global.html#handleDelete">handleDelete</a></li><li><a href="global.html#handleImageSelection">handleImageSelection</a></li><li><a href="global.html#handleLogin">handleLogin</a></li><li><a href="global.html#handleRegister">handleRegister</a></li><li><a href="global.html#handleSave">handleSave</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#load">load</a></li><li><a href="global.html#pickImage">pickImage</a></li><li><a href="global.html#requestImagePermission">requestImagePermission</a></li><li><a href="global.html#selectAndUploadImage">selectAndUploadImage</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#tabBarIcon">tabBarIcon</a></li><li><a href="global.html#toggleDatosForm">toggleDatosForm</a></li><li><a href="global.html#updateUserProfilePhoto">updateUserProfilePhoto</a></li><li><a href="global.html#uploadImageToCloudinary">uploadImageToCloudinary</a></li><li><a href="global.html#upsertDatos">upsertDatos</a></li><li><a href="global.html#user">user</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Nov 03 2025 21:40:40 GMT-0500 (hora estándar de Colombia)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
