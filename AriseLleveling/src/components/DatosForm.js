@@ -35,7 +35,6 @@ const DatosForm =({onClose}) => {
      * @type {[{nombre: string, edad: number | null}, Function]}
      * @description Estado que contiene los valores actuales del formulario.
      */
-
     const [form, setForm]= useState(emptyForm);
 
     /**
@@ -62,7 +61,7 @@ const DatosForm =({onClose}) => {
 
             try {
                 setloading(true);
-                const data = sqliteService.getDatosById(user.uid);
+                const data = sqliteService.getDatosById(user.id);
                 if (mounted) {
                     if (data) {
                         setForm({
@@ -108,7 +107,7 @@ const DatosForm =({onClose}) => {
         try {
             setloading(true);
             // Llamada síncrona
-            sqliteService.upsertAcademic(user.uid, form);
+            sqliteService.upsertDatos(user.id, form);
             Alert.alert('Guardado', 'Datos académicos guardados localmente');
             onClose(); // Cerrar el formulario después de guardar
         } catch (e) {
@@ -133,7 +132,7 @@ const DatosForm =({onClose}) => {
                 (async () => {
                     try {
                         setloading(true);
-                        sqliteService.deleteAcademicById(user.uid);
+                        sqliteService.deleteDatosById(user.id);
                         setForm(emptyForm);
                         Alert.alert('Eliminado', 'Datos académicos eliminados');
                         onClose();
@@ -163,7 +162,7 @@ const DatosForm =({onClose}) => {
         <ScrollView contentContainerStyle={styles.container}>
 
             <View style={styles.header}>
-                <Text style={styles.sectionTitle}>Datos Académicos </Text>
+                <Text style={styles.sectionTitle}>Datos</Text>
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                     <Text style={styles.closeButtonText}>X</Text>
                 </TouchableOpacity>

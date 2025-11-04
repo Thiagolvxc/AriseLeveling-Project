@@ -10,7 +10,6 @@ import {initializeAuth, getReactNativePersistence} from "firebase/auth"
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage"
 import {getStorage} from "firebase/storage"
 import {getFirestore} from "firebase/firestore"
-// import {GoogleSignin} from '@react-native-google-signin/google-signin'
 
 /**
  * @constant {Object} firebaseConfig
