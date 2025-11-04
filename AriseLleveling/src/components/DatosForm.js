@@ -173,7 +173,7 @@ const DatosForm =({onClose}) => {
             <TextInput style={styles.input} value={form.nombre} onChangeText={t => handleChange('nombre', t)} placeholder="Nombre Completo"/>
 
             <Text style={styles.label}>Edad</Text>
-            <TextInput style={styles.input} value={form.edad ? String(form.edad) : ''} onChangeText={t => handleChange('edad')} placeholder="Edad" keyboardType='numeric'/>
+            <TextInput style={styles.input} value={form.edad} onChangeText={t => handleChange('edad', t)} placeholder="Edad" keyboardType='numeric'/>
 
             <View style={styles.row}>
 
