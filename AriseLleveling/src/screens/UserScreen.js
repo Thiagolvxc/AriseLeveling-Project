@@ -1,3 +1,9 @@
+/**
+ * @file UserScreen.jsx
+ * @description Pantalla de perfil de usuario. Permite ver, actualizar y administrar la información del usuario,
+ * incluyendo la foto de perfil y los datos almacenados localmente.
+ */
+
 import React from 'react'
 import colors from '../constants/colors'
 import { useEffect, useState, useCallback } from 'react'
@@ -10,16 +16,78 @@ import DatosForm from '../components/DatosForm'
 import { ScrollView } from 'react-native-gesture-handler'
 import { updateUserProfilePhoto, getUserData } from '../services/userService'
 
+/**
+ * @component UserScreen
+ * @description Pantalla de perfil del usuario autenticado.
+ * Permite visualizar los datos del usuario, modificar su foto de perfil
+ * y acceder a un formulario local para editar información adicional almacenada en SQLite.
+ *
+ * @param {Object} props - Propiedades del componente.
+ * @param {import('@react-navigation/native').NavigationProp} props.navigation - Objeto de navegación de React Navigation.
+ *
+ * @returns {JSX.Element} Pantalla de usuario con opciones de edición y carga de datos.
+ */
 const UserScreen = ({navigation }) => {
+
+  /**
+   * @constant {Object} user - Usuario actual obtenido desde el contexto de autenticación.
+   */
   const {user} = useAuth();
+
+  /**
+   * @state imageUri
+   * @type {string|null}
+   * @description URI de la imagen actual del usuario (local o remota).
+   */
   const [imageUri, setImageUri] = useState(null);
+
+  /**
+   * @state userData
+   * @type {Object|null}
+   * @description Datos adicionales del usuario obtenidos desde Firestore.
+   */
   const [userData, setUserData] = useState(null);
+
+  /**
+   * @state loading
+   * @type {boolean}
+   * @description Indica si hay una operación de carga o actualización en progreso.
+   */
   const [loading, setLoading] = useState(false);
+
+  /**
+   * @state selectedImage
+   * @type {Object|null}
+   * @description Imagen seleccionada por el usuario antes de subirla.
+   */
   const [selectedImage, setSelectedImage] = useState(null);
+
+  /**
+   * @state showPreview
+   * @type {boolean}
+   * @description Controla la visualización previa de la imagen antes de confirmarla.
+   */
   const [showPreview, setShowPreview] = useState(false);
+
+  /**
+   * @constant {string}
+   * @description URL de la imagen por defecto cuando el usuario no tiene foto asignada.
+   */
   const defaultImage = 'https://via.placeholder.com/150';
+
+  /**
+   * @state showDatosForm
+   * @type {boolean}
+   * @description Controla la visualización del formulario local (DatosForm) para editar datos almacenados en SQLite.
+   */
   const [showDatosForm,setShowDatosForm]= useState(false);
 
+  /**
+   * @function fetchUserProfile
+   * @async
+   * @description Obtiene los datos del perfil del usuario desde Firestore.
+   * Si existe una foto de perfil, la muestra; de lo contrario, usa la imagen por defecto.
+   */
   const fetchUserProfile = useCallback(async () => {
     if (user) {
       setLoading(true);
@@ -35,16 +103,31 @@ const UserScreen = ({navigation }) => {
       }
     }
   }, [user]);
+
+  /**
+   * @hook useFocusEffect
+   * @description Ejecuta `fetchUserProfile` cada vez que la pantalla obtiene foco,
+   * asegurando que los datos se mantengan actualizados.
+   */
   useFocusEffect(
     useCallback(() => {
       fetchUserProfile();
     }, [fetchUserProfile])
   );
 
+  /**
+   * @function toggleDatosForm
+   * @description Alterna la visualización del formulario local de datos (DatosForm).
+   */
   const toggleDatosForm = () => {
     setShowDatosForm(!showDatosForm);
   };
 
+  /**
+   * @function handleImageSelection
+   * @async
+   * @description Abre el selector de imágenes del dispositivo para elegir una nueva foto de perfil.
+   */
   const handleImageSelection = async () => {
     try {
       const imageAsset = await pickImage();
@@ -58,6 +141,12 @@ const UserScreen = ({navigation }) => {
     }
   };
 
+  /**
+   * @function handleConfirmUpload
+   * @async
+   * @description Confirma y sube la imagen seleccionada a Cloudinary.
+   * Actualiza la foto de perfil del usuario en Firestore y en el contexto local.
+   */
   const handleConfirmUpload = async () => {
     if (!selectedImage) return;
 
@@ -81,6 +170,10 @@ const UserScreen = ({navigation }) => {
     }
   };
 
+  /**
+   * @function handleCancelSelection
+   * @description Cancela la selección de imagen y oculta la vista previa.
+   */
   const handleCancelSelection = () => {
     setSelectedImage(null);
     setShowPreview(false);

@@ -1,3 +1,9 @@
+/**
+ * @file LoginScreen.jsx
+ * @description Pantalla de inicio de sesión del usuario.
+ * Permite autenticar al usuario mediante correo electrónico y contraseña usando Firebase Authentication.
+ */
+
 import React, {useState} from 'react'
 import {View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -6,34 +12,57 @@ import {auth} from '../../services/firebaseConfig'
 import colors from '../../constants/colors'
 import {useNavigation} from '@react-navigation/native'
 
+/**
+ * @component LoginScreen
+ * @description Componente que gestiona el inicio de sesión de los usuarios.
+ * Incluye validaciones de formulario, manejo de errores y navegación posterior al inicio de sesión exitoso.
+ * @param {Object} props - Propiedades del componente.
+ * @param {Object} props.navigation - Objeto de navegación de React Navigation.
+ * @returns {JSX.Element} Vista de la pantalla de inicio de sesión.
+ */
 const LoginScreen = ({navigation}) => {
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Estado que almacena el correo electrónico del usuario.
+     */
     const [email, setEmail] = useState('')
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Estado que almacena la contraseña del usuario.
+     */
     const [password, setPassword] = useState('')
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Mensaje de error actual mostrado al usuario (por ejemplo, error de validación o autenticación).
+     */
     const [error, setError] = useState('')
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Mensaje adicional de error (actualmente no utilizado, reservado para validaciones más detalladas).
+     */
     const [errorMessages, setErrorMessages] = useState('')
+
+    /**
+     * @constant
+     * @description Hook de navegación para realizar redirecciones dentro de la app.
+     */
     const Navigation = useNavigation();
 
-    // const handleGoogleSignIn = async () => {
-    //     try {
-    //         await GoogleSignin.hasPlayServices();
-    //         const { idToken } = await GoogleSignin.signIn();
-            
-    //         const credential = GoogleAuthProvider.credential(idToken);
-            
-    //         const userCredential = await signInWithCredential(auth, credential);
-            
-    //         Alert.alert('Éxito', 'Inicio de sesión con Google exitoso', [
-    //             {text: 'OK', onPress: () => navigation.reset({
-    //                 index: 0,
-    //                 routes: [{ name: 'Main' }],
-    //             })}
-    //         ]);
-    //     } catch (error) {
-    //         console.error('Error al iniciar sesión con Google:', error);
-    //         setError('Error al iniciar sesión con Google');
-    //     }
-    // };
-
+    /**
+     * @async
+     * @function handleLogin
+     * @description Maneja el proceso de inicio de sesión con Firebase Authentication.
+     * Realiza validación de campos, autenticación y manejo de errores específicos.
+     * @throws {FirebaseError} En caso de que falle la autenticación, se captura y muestra un mensaje apropiado.
+     */
     const handleLogin = async () => {
         if (!email || !password) {
             setError('Por favor completa todos los campos');
@@ -111,14 +140,6 @@ const LoginScreen = ({navigation}) => {
                 <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity 
-                style={styles.googleButton}
-                onPress={handleGoogleSignIn}
-            >
-                <Icon name="google" size={24} color="#fff" style={styles.googleIcon} />
-                <Text style={styles.googleButtonText}>Continuar con Google</Text>
-            </TouchableOpacity> */}
-
             <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>¿No tienes una cuenta? </Text>
                 <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -129,14 +150,6 @@ const LoginScreen = ({navigation}) => {
         </View>
     )
 }
-
-    // Botón de Google
-    // const GoogleSignInButton = () => (
-    //     <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
-    //         <Icon name="google" size={24} color="#fff" style={styles.googleIcon} />
-    //         <Text style={styles.googleButtonText}>Continuar con Google</Text>
-    //     </TouchableOpacity>
-    // );
 
 const styles = StyleSheet.create({
     googleButton: {

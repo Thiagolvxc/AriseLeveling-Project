@@ -1,3 +1,10 @@
+/**
+ * @file RegisterScreen.jsx
+ * @description Pantalla de registro de usuario. 
+ * Permite crear una nueva cuenta mediante correo electrónico y contraseña usando Firebase Authentication,
+ * y actualiza el perfil del usuario con su nombre.
+ */
+
 import React, {useState} from 'react'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert} from 'react-native'
@@ -6,13 +13,58 @@ import {createUserWithEmailAndPassword} from 'firebase/auth'
 import {auth} from '../../services/firebaseConfig'
 import {updateProfile} from 'firebase/auth'
 
+/**
+ * @component RegisterScreen
+ * @description Componente que gestiona el registro de nuevos usuarios en la aplicación.
+ * Incluye validaciones de entrada, creación de cuenta en Firebase y manejo de errores específicos.
+ * @param {Object} props - Propiedades del componente.
+ * @param {Object} props.navigation - Objeto de navegación de React Navigation para redirigir entre pantallas.
+ * @returns {JSX.Element} Pantalla de registro del usuario.
+ */
 const RegisterScreen = ({navigation}) => {
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Estado que almacena el nombre completo del usuario.
+     */
     const [name, setName] = useState('')
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Estado que almacena el correo electrónico ingresado por el usuario.
+     */
     const [email, setEmail] = useState('')
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Estado que almacena la contraseña ingresada por el usuario.
+     */
     const [password, setPassword] = useState('')
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Estado que almacena la confirmación de contraseña ingresada.
+     */
     const [confirmPassword, setConfirmPassword] = useState('')
+
+    /**
+     * @state
+     * @type {[string, Function]}
+     * @description Estado que almacena mensajes de error que se muestran al usuario.
+     */
     const [error, setError] = useState('')
 
+    /**
+     * @async
+     * @function handleRegister
+     * @description Maneja el proceso de registro de un nuevo usuario.
+     * Realiza validaciones de los campos, crea la cuenta en Firebase y actualiza el perfil del usuario.
+     * @throws {FirebaseError} Captura errores de Firebase Authentication y muestra mensajes personalizados.
+     */
     const handleRegister = async () => {
         if (!name || !email || !password || !confirmPassword) {
             setError('Todos los campos son obligatorios');
