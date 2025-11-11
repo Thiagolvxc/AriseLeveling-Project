@@ -15,13 +15,7 @@ const db = SQLite.openDatabaseSync('AriseLleveling');
 
 /**
  * @function init
- * @description Inicializa la base de datos local y crea la tabla `user_Datos` si no existe.
- * 
- * La tabla contiene los siguientes campos:
- * - `id`: Identificador único (autoincremental).
- * - `nombre`: Nombre del usuario.
- * - `edad`: Edad del usuario.
- * 
+ * @description Inicializa la base de datos local y crea las tablas necesarias.
  * @returns {void}
  */
 export const init = () => {
@@ -31,7 +25,20 @@ export const init = () => {
             nombre TEXT,
             edad INTEGER
         );`
-    )
+    );
+    
+    db.execSync(
+        `CREATE TABLE IF NOT EXISTS ejercicios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId INTEGER,
+            nombre TEXT NOT NULL,
+            repeticiones INTEGER,
+            series INTEGER,
+            peso REAL,
+            fecha TEXT NOT NULL,
+            createdAt TEXT DEFAULT (datetime('now'))
+        );`
+    );
 }
 
 /**
@@ -94,7 +101,67 @@ const deleteDatosById = (id) => {
 }
 
 /**
+ * @function agregarEjercicio
+ * @description Agrega un nuevo ejercicio a la base de datos.
+ * @param {number} userId - ID del usuario.
+ * @param {Object} ejercicio - Datos del ejercicio.
+ * @param {string} ejercicio.nombre - Nombre del ejercicio.
+ * @param {number} ejercicio.repeticiones - Número de repeticiones.
+ * @param {number} ejercicio.series - Número de series.
+ * @param {number|null} ejercicio.peso - Peso utilizado (opcional).
+ * @param {string} ejercicio.fecha - Fecha del ejercicio (formato YYYY-MM-DD).
+ * @returns {SQLite.RunResult} Resultado de la operación SQLite.
+ */
+const agregarEjercicio = (userId, {nombre, repeticiones, series, peso = null, fecha}) => {
+    const result = db.runSync(
+        `INSERT INTO ejercicios (userId, nombre, repeticiones, series, peso, fecha) 
+         VALUES (?, ?, ?, ?, ?, ?);`,
+        [userId, nombre, repeticiones, series, peso, fecha]
+    );
+    return result;
+}
+
+/**
+ * @function getEjerciciosPorFecha
+ * @description Obtiene todos los ejercicios de un usuario para una fecha específica.
+ * @param {number} userId - ID del usuario.
+ * @param {string} fecha - Fecha en formato YYYY-MM-DD.
+ * @returns {Array} Lista de ejercicios del día.
+ */
+const getEjerciciosPorFecha = (userId, fecha) => {
+    const rows = db.getAllSync(
+        `SELECT * FROM ejercicios 
+         WHERE userId = ? AND fecha = ? 
+         ORDER BY createdAt DESC;`,
+        [userId, fecha]
+    );
+    return rows || [];
+}
+
+/**
+ * @function eliminarEjercicio
+ * @description Elimina un ejercicio por su ID.
+ * @param {number} ejercicioId - ID del ejercicio a eliminar.
+ * @returns {SQLite.RunResult} Resultado de la operación SQLite.
+ */
+const eliminarEjercicio = (ejercicioId) => {
+    const result = db.runSync(
+        `DELETE FROM ejercicios WHERE id = ?;`,
+        [ejercicioId]
+    );
+    return result;
+}
+
+/**
  * @exports
  * @description Exporta las funciones principales del servicio SQLite.
  */
-export default {init, upsertDatos, getDatosById, deleteDatosById}
+export default {
+    init, 
+    upsertDatos, 
+    getDatosById, 
+    deleteDatosById,
+    agregarEjercicio,
+    getEjerciciosPorFecha,
+    eliminarEjercicio
+}
